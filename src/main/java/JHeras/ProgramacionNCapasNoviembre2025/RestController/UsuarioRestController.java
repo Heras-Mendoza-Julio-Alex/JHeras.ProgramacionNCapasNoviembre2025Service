@@ -166,8 +166,8 @@ public class UsuarioRestController {
             + "o xlsx, se generea un token SHA-256, se copia el archivo recibido a la carpeta"
             + "de archivos y logs")
     @PostMapping(value = "/cargamasiva", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String cargaMasiva(@RequestBody MultipartFile archivo) {
-        String result = cargaMasivaService.tokenArchivo(archivo);
+    public Result cargaMasiva(@RequestParam("archivo") MultipartFile archivo) {
+        Result result = cargaMasivaService.tokenArchivo(archivo);
         return result;
     }
 

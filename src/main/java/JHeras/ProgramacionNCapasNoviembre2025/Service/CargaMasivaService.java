@@ -31,6 +31,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.multipart.MultipartFile;
 import JHeras.ProgramacionNCapasNoviembre2025.JPA.ErrorCarga;
+import JHeras.ProgramacionNCapasNoviembre2025.JPA.Result;
 import java.util.Random;
 import org.springframework.validation.BindingResult;
 
@@ -43,15 +44,19 @@ public class CargaMasivaService {
     @Autowired
     private ValidationService validatorService;
 
-    public String tokenArchivo(MultipartFile archivo) {
+    public Result tokenArchivo(MultipartFile archivo) {
+        Result result = new Result();
+        //para los errorescarga
+        result.Objects = new ArrayList<>();
 
         /*--------------------Parte del token---------------------------*/
         String token = "";
-         
         
+        String input=archivo.getOriginalFilename() + "_" + System.currentTimeMillis() ;
+
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(archivo.getOriginalFilename().getBytes());
+            byte[] hashBytes = digest.digest(input.getBytes());
             StringBuilder hexString = new StringBuilder();
             for (byte b : hashBytes) {
                 String hex = Integer.toHexString(0xff & b);
@@ -62,7 +67,8 @@ public class CargaMasivaService {
             }
             token = hexString.toString();
         } catch (Exception ex) {
-            return "Error al convertir en SHA-256";
+            result.Correct = false;
+            ex.getLocalizedMessage();
         }
 
         /*---------------------Parte de copiar el archivo------------------*/
@@ -94,7 +100,29 @@ public class CargaMasivaService {
             Logger.getLogger(CargaMasivaService.class.getName()).log(Level.SEVERE, "Error al copiar log", ex);
         }
 
-        return token;
+        /*--------------------Parte de loa validación---------------------------*/
+        String extension = archivo.getOriginalFilename().substring(archivo.getOriginalFilename().lastIndexOf('.') + 1);
+        List<Usuario> usuarios = new ArrayList<>();
+
+        //parte de la revisión de txt o xlsx
+        if (extension.equalsIgnoreCase("txt")) {
+            usuarios = LecturaArchivo(archivoDestino);
+        } else if (extension.equalsIgnoreCase("xlsx")) {
+            usuarios = LecturaArchivoExcel(archivoDestino);
+        }
+
+        //parte de los errores del archivo
+        List<ErrorCarga> errores = ValidarDatos(usuarios);
+        if (errores.isEmpty()) {
+            result.Correct = true;
+            result.object = token; // Devolvemos el token para el siguiente paso
+        } else {
+            result.Correct = false;
+            result.Objects = (List<Object>) (List<?>) errores; // Enviamos la lista de errores
+            result.ErrorMessage = "El archivo contiene errores de validación.";
+        }
+
+        return result;
 
     }
 
@@ -171,10 +199,10 @@ public class CargaMasivaService {
                 int idr = Integer.parseInt(row.getCell(11).toString());
 
                 usuario.Rol.setIdRol(idr);
-                
+
                 usuario.setEstatus(Integer.parseInt(row.getCell(12).toString()));
                 usuario.setImagen(row.getCell(13).toString());
-                
+
                 usuarios.add(usuario);
             }
         } catch (Exception ex) {
@@ -221,7 +249,7 @@ public class CargaMasivaService {
 
     @Transactional
     public String ProcesarArchivo(String token) {
-              
+
         String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "logs";
         File directorio = new File(path);
 
@@ -259,19 +287,15 @@ public class CargaMasivaService {
             return "El formato no es txt o xlsx";
         }
 
-        List<ErrorCarga> errores = ValidarDatos(usuarios);
 
-        if (errores.isEmpty()) {
-            try {
-                for (Usuario usuario : usuarios) {
-                    usuarioJPADAOImplementation.add(usuario);
-                }
-                return "CARGA_EXITOSA";
-            } catch (Exception e) {
-                return "ERROR_INSERCION: " + e.getMessage();
+        try {
+            for (Usuario usuario : usuarios) {
+                usuarioJPADAOImplementation.add(usuario);
             }
-        } else {
-            return "ERRORES_ENCONTRADOS: " + errores.size() + " campos con errores.";
+            return "CARGA_EXITOSA";
+        } catch (Exception e) {
+            return "ERROR_INSERCION: " + e.getMessage();
         }
+
     }
 }

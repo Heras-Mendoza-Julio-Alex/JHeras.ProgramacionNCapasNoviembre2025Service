@@ -13,6 +13,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -27,33 +30,54 @@ public class Usuario {
     private int IdUsuario;
 
     @Column(name = "NOMBRE", nullable = false)
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
+    @Pattern(regexp = "[a-zA-Z]+", message = "Ingresa solo letras")
     private String Nombre;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
+    @Pattern(regexp = "[a-zA-Z]+", message = "Ingresa solo letras")
     @Column(name = "APELLIDOPATERNO", nullable = false)
     private String ApellidoPaterno;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
+    @Pattern(regexp = "[a-zA-Z]+", message = "Ingresa solo letras")
     @Column(name = "APELLIDOMATERNO")
     private String ApellidoMaterno;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
+    @Pattern(regexp = "^\\d{10}$", message = "Ingresa un numero valido")
     @Column(name = "TELEFONO", nullable = false)
     private String Telefono;
 
     @Column(name = "FECHANACIMIENTO", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "El campo es requerido")
     private Date fechanacimiento;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
     @Column(name = "USERNAME", nullable = false)
     private String Username;
 
     @Column(name = "EMAIL", nullable = false)
     private String Email;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
     @Column(name = "SEXO", nullable = false)
     private String Sexo;
 
+    @NotEmpty(message = "El campo es requerido")
+    @NotNull(message = "El campo es requerido")
+    @Pattern(regexp = "^\\d{10}$", message = "Ingresa un numero valido")
     @Column(name = "CELULAR")
     private String Celular;
 
+    
     @Column(name = "CURP")
     private String Curp;
 
