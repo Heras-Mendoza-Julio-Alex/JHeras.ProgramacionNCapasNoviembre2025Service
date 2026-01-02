@@ -1,6 +1,7 @@
 package JHeras.ProgramacionNCapasNoviembre2025.JPA;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,6 +68,7 @@ public class Usuario {
 
     @ManyToOne
     @JoinColumn(name = "IDROL")
+    @JsonIgnore
     public Rol Rol;
 
     @OneToMany(mappedBy = "Usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -183,7 +185,6 @@ public class Usuario {
 //    public void setDirecciones(List<Direccion> Direcciones) {
 //        this.Direcciones = Direcciones;
 //    }
-
     public int getEstatus() {
         return estatus;
     }
@@ -191,16 +192,13 @@ public class Usuario {
     public void setEstatus(int estatus) {
         this.estatus = estatus;
     }
-    
-    
-     public String getImagen() {
+
+    public String getImagen() {
         return Imagen;
     }
 
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
-
-    
 
 }

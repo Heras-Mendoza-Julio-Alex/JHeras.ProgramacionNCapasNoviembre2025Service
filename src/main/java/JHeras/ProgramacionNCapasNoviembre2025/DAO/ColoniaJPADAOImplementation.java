@@ -48,11 +48,13 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA{
                     .setParameter("idParam", IdMunicipio)
                     .getResultList();
 
-            result.object = lista;
-
+            if (!lista.isEmpty()) {
+                result.object = lista;
+                result.StatusCode = 200;
+            }else{
+                result.StatusCode=404;
+            }                      
             result.Correct = true;
-
-            result.StatusCode = 200;
 
         } catch (Exception ex) {
             result.Correct = false;

@@ -24,12 +24,19 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
         try {
             Direccion direccionBD = entityManager.find(Direccion.class, IdDireccion);
 
-            result.object = direccionBD;
-            result.StatusCode = 201;
+            if (direccionBD != null) {
+                result.object = direccionBD;
+                result.StatusCode = 200;
+            } else {
+                result.StatusCode = 404;
+            }
+
+            result.Correct = true;
+
         } catch (Exception ex) {
             result.ErrorMessage = ex.getLocalizedMessage();
             result.Correct = false;
-            result.StatusCode = 400;
+            result.StatusCode = 500;
         }
 
         return result;
@@ -40,8 +47,6 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
     public Result edit(Direccion direccion, int IdUsuario) {
         Result result = new Result();
 
-        
-        
         try {
             TypedQuery<Direccion> queryDireccion = entityManager.createQuery(
                     "FROM Direccion WHERE idDireccion = :idDireccion",
@@ -53,10 +58,9 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
             Direccion direccionJPA = queryDireccion.getSingleResult();
 
             if (direccionJPA != null) {
-                // Actualizo
                 direccion.Usuario = direccionJPA.Usuario;
                 entityManager.merge(direccion);
-                
+
             } else {
                 result.StatusCode = 404;
                 result.Correct = false;
@@ -67,8 +71,8 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
         } catch (Exception ex) {
             result.ErrorMessage = ex.getLocalizedMessage();
             result.Correct = false;
-            result.ex=ex;
-            result.StatusCode = 400;
+            result.ex = ex;
+            result.StatusCode = 500;
         }
 
         return result;
@@ -79,10 +83,11 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
     @Override
     public Result add(Direccion direccion, int IdUsuario) {
         Result result = new Result();
-        
-        direccion.Usuario=new Usuario();
+
+        direccion.Usuario = new Usuario();
         direccion.Usuario.setIdUsuario(IdUsuario);
-        
+                
+
         try {
 
             entityManager.persist(direccion);
@@ -92,7 +97,7 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
             result.Correct = false;
             result.ErrorMessage = ex.getLocalizedMessage();
             result.ex = ex;
-            result.StatusCode = 400;
+            result.StatusCode = 500;
         }
 
         return result;
@@ -108,16 +113,18 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
             Direccion direccion = entityManager.find(Direccion.class, idDireccion);
 
             if (direccion != null) {
-                entityManager.remove(direccion);                
-
+                entityManager.remove(direccion);
+                result.StatusCode = 200;
+            }else{
+                result.StatusCode=404;
             }
-            result.StatusCode = 200;
+
             result.Correct = true;
         } catch (Exception ex) {
             result.Correct = false;
             result.ErrorMessage = ex.getLocalizedMessage();
             result.ex = ex;
-            result.StatusCode = 400;
+            result.StatusCode = 500;
         }
 
         return result;

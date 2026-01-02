@@ -50,11 +50,15 @@ public class EstadoJPADAOImplementation implements IEstadoJPA {
                     .setParameter("idParam", IdPais)
                     .getResultList();
 
-            result.object = listaEstados;
+            if (!listaEstados.isEmpty()) {
+                result.object = listaEstados;
+                result.StatusCode = 200;
+            }else{
+                result.StatusCode=404;
+            }
+            
 
             result.Correct = true;
-
-            result.StatusCode = 200;
 
         } catch (Exception ex) {
             result.Correct = false;

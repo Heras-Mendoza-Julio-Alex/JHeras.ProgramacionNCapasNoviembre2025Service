@@ -2,6 +2,7 @@ package JHeras.ProgramacionNCapasNoviembre2025.DAO;
 
 import JHeras.ProgramacionNCapasNoviembre2025.JPA.Usuario;
 import JHeras.ProgramacionNCapasNoviembre2025.JPA.Result;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IUsuarioJPA {
     
@@ -20,5 +21,7 @@ public interface IUsuarioJPA {
     public Result busqueda(Usuario usuario);
     
     public Result Imagen(int IdUsuario, String imagenCadena);
+    
+//    public String cargaMasiva(MultipartFile carga);
 
 }
